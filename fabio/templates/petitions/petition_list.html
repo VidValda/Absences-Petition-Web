@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pending Petitions</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <header class="bg-dark text-white py-3">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <img src="https://i.imgur.com/z4gMSNl.png" alt="Logo" style="height: 150px;">
+            </div>
+            <div>
+                <h1>Petition Management System</h1>
+                <p>Welcome to the Pending Absences Petitions Dashboard</p>
+            </div>
+        </div>
+    </header>
+    <div class="container mt-5">
+        <h1 class="mb-4">Pending Absences Petitions</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>TimeStamp</th>
+                    <th>CI</th>
+                    <th>Email</th>
+                    <th>Student Name</th>
+                    <th>Subjects</th>
+                    <th>Hours</th>
+                    <th>Date</th>
+                    <th>Petition Text</th>
+                    <th>Status</th>
+                    <th>PDF</th>
+                    <th>Actions</th>
+                    <th>Observations</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for petition in petitions %}
+                <tr>
+
+                    <td>{{ petition.id }}</td>
+                    <td>{{ petition.timestamp }}</td>
+                    <td>{{ petition.ci }}</td>
+                    <td>{{ petition.email }}</td>
+                    <td>{{ petition.student_name }}</td>
+                    <td>
+                        <button class="btn btn-outline-primary subject-toggle" data-toggle="collapse" data-target="#subject{{ petition.id }}" aria-expanded="false">
+                            <span>Show Subjects</span>
+                        </button>
+                        <div id="subject{{ petition.id }}" class="collapse">
+                            {{ petition.subjects }}
+                        </div>
+                    </td>
+                    <td>{{ petition.hours }}</td>
+                    <td>{{ petition.date }}</td>
+                    <td>{{ petition.petition_text }}</td>
+                    <td>{{ petition.status }}</td>
+                    
+                    <td>
+                        {% if petition.pdf_file %}
+                            <a href="{{ MEDIA_URL }}{{ petition.pdf_file.url }}" target="_blank">View PDF</a>
+                        {% else %}
+                            No PDF
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <form method="post" action="{% url 'update_petition' petition.id 'accepted' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                            </form>
+                            <form method="post" action="{% url 'update_petition' petition.id 'declined' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm ml-2">Decline</button>
+                            </form>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="observation{{ petition.id }}" value="{{ petition.observation }}">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary update-observation" data-petition-id="{{ petition.id }}">Update</button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+                <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+                <script>
+                    $(document).ready(function() {
+                        // Add click event listener to the subject-toggle buttons
+                        $(".subject-toggle").click(function() {
+                            // Find the corresponding subject div using data-target attribute
+                            var targetId = $(this).data("target");
+                            // Toggle the visibility of the subject div with a smooth transition
+                            $(targetId).collapse("toggle");
+                            // Toggle the button text between "Show Subjects" and "Hide Subjects"
+                            $(this).find('span').text(function(_, text) {
+                                return text === "Show Subjects" ? "Hide Subjects" : "Show Subjects";
+                            });
+                        });
+                    });
+                </script>
+                <script>
+                    $(document).ready(function() {
+                        // Add click event listener to the update-observation buttons
+                        $(".update-observation").click(function() {
+                            // Get the petition ID from the data-petition-id attribute
+                            var petitionId = $(this).data("petition-id");
+                            // Get the observation value from the corresponding input field
+                            var observationValue = $("#observation" + petitionId).val();
+                            // Show a confirmation message
+                            var confirmationMessage = "Observation for Petition #" + petitionId + " updated.";
+                            alert(confirmationMessage);
+                            // Send an AJAX request to update the observation in the model
+                            $.ajax({
+                                type: "POST",
+                                url: "{% url 'update_observation' %}",
+                                data: {
+                                    petition_id: petitionId,
+                                    observation: observationValue,
+                                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                                },
+                                success: function(response) {
+                                    // Optionally, you can handle the success response here
+                                    // For example, display a success message
+                                    console.log("Observation updated successfully.");
+                                },
+                                error: function(xhr, status, error) {
+                                    // Handle errors here if needed
+                                    console.error("Error updating observation:", error);
+                                },
+                            });
+                        });
+                    });
+                </script>
+            </tbody>
+        </table>
+    </div>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

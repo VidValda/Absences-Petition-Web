@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ID Search</title>
+</head>
+<body>
+    <h1>ID Search</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Search</button>
+    </form>
+
+    {% if matched_ids %}
+        <h2>Matching IDs:</h2>
+        <ul>
+            {% for id_obj in matched_ids %}
+                <li>{{ id_obj.id_number }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
