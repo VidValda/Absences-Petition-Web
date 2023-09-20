@@ -9,7 +9,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 urlpatterns = [
     path('petition-list/', views.petition_list, name='petition_list'),
     
-    path('update/<int:petition_id>/<str:new_status>/', views.update_petition_status, name='update_petition'),
+    path('update/<int:permiso_id>/<str:new_status>/', views.update_petition_status, name='update_petition'),
     path('create',views.create_petition,name='create_petition'),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),

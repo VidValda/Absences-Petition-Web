@@ -6,26 +6,32 @@ class TodoItem(models.Model):
     title = models.CharField(max_length=200)
     completed = models.BooleanField(default=False)
 
-
-class Petition(models.Model):
-    STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('accepted', 'Accepted'),
-        ('declined', 'Declined'),
-    )
-    ci = models.CharField(max_length=10)
+class RegistroEstudiantes(models.Model):
+    name = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
     email = models.EmailField()
-    student_name = models.CharField(max_length=100)
-    subjects = models.TextField()
-    hours = models.CharField(max_length=50)
-    date = models.DateField()
-    petition_text = models.TextField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    pdf_file = models.FileField(upload_to='petition_pdfs/', blank=True, null=True)
-    observations = models.TextField(blank=True, null=True)
+    ci = models.IntegerField()
+
+class RegistroPermisos(models.Model):
+    STATUS_CHOICES = (
+        ('pendiente', 'Pendiente'),
+        ('aceptado', 'Aceptado'),
+        ('rechazado', 'Rechazado'),
+    )
+
+    materia = models.TextField()
+    fecha = models.DateField()
+    justificacion = models.FileField(upload_to='pdfs/', blank=True, null=True)
+    project = models.ForeignKey(RegistroEstudiantes, on_delete=models.CASCADE)
+
+    horaFin = models.TimeField()
+    horaInicio = models.TimeField()
+    fechaSolicitud = models.DateField()
+    estado = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    descripcion = models.TextField()
+    observacion = models.TextField(blank=True, null=True)
 
     
-
 
 # class Petition(models.Model):
 #     student_name = models.CharField(max_length=100)

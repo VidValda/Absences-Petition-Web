@@ -1,13 +1,18 @@
 from django import forms
-from .models import Petition
+from .models import RegistroPermisos, RegistroEstudiantes, TodoItem
 
-class PetitionForm(forms.ModelForm):
+class RegistroPermisosForm(forms.ModelForm):
     class Meta:
-        model = Petition
-        # fields = ['ci','student_name','desde','hasta','date', 'petition_text', 'pdf_file']
-        fields = ['student_name', 'petition_text', 'pdf_file']
-        fields = ['ci', 'email', 'student_name', 'subjects', 'hours', 'date', 'petition_text', 'pdf_file']
+        model = RegistroPermisos
+        fields = '__all__'
+
+class RegistroEstudiantesForm(forms.ModelForm):
+    class Meta:
+        model = RegistroEstudiantes
+        fields = '__all__'
 
 
-# class IDSearchForm(forms.Form):
-#     id_number = forms.CharField(label='Enter ID', max_length=20)
+# class PetitionForm(forms.ModelForm):
+#     class Meta:
+#         model = Petition
+#         fields = '__all__'

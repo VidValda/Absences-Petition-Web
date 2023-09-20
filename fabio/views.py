@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse, redirect
-from .models import Petition
-from .forms import PetitionForm
+from .models import RegistroPermisos,RegistroEstudiantes
+from .forms import RegistroPermisosForm, RegistroEstudiantesForm
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import View  # Import the View class
@@ -16,8 +16,10 @@ class AdminOnlyView(LoginRequiredMixin, View):
 
     def get(self, request):
         if request.user.is_staff:  # Additional check for admin users
-            petitions = Petition.objects.filter(status='pending')
-            return render(request, 'petitions/petition_list.html', {'petitions': petitions})
+            permisos = RegistroPermisos.objects.filter(estado='pendiente')
+     
+            combined_list = [(permiso, permiso.project) for permiso in permisos]
+            return render(request, 'petitions/petition_list.html', {'permisos': combined_list})
         else:
             return render(request, 'petitions/not_authorized.html')
 
@@ -26,38 +28,40 @@ class AdminOnlyView(LoginRequiredMixin, View):
 
 @user_passes_test(admin_user_check, login_url='/login/')
 def petition_list(request):
-    petitions = Petition.objects.filter(status='pending')
-    return render(request, 'petitions/petition_list.html', {'petitions': petitions})
+    permisos = RegistroPermisos.objects.filter(estado='pendiente')
+    combined_list = [(permiso, permiso.project) for permiso in permisos]
+
+    return render(request, 'petitions/petition_list.html', {'permisos': combined_list})
 
 
-def update_petition_status(request, petition_id, new_status):
-    petition = Petition.objects.get(pk=petition_id)
+def update_petition_status(request, permiso_id, new_status):
+    permiso = RegistroPermisos.objects.get(pk=permiso_id)
 
     if request.method == 'POST':
-        if new_status == 'accepted' or new_status == 'declined':
-            form = PetitionForm(request.POST, instance=petition)
-            if form.is_valid():
-                if new_status == 'accepted' or new_status == 'declined':
-                    petition.status = new_status
-                    petition.observations = form.cleaned_data['observations']
-                    petition.save()
-                    return redirect('petition_list')
+        
+        if new_status == 'aceptado' or new_status == 'rechazado':
+            form = RegistroPermisosForm(request.POST, instance=permiso)
+            print(new_status)
+            permiso.estado = new_status
+            permiso.save()
+            return redirect('petition_list')
+        
         else:
             return redirect('petition_list')
     else:
-        form = PetitionForm(instance=petition)
+        form = RegistroPermisosForm(instance=permiso)
 
-    return render(request, 'petitions/update_petition.html', {'form': form, 'petition': petition, 'new_status': new_status})
+    return render(request, 'petitions/update_petition.html', {'form': form, 'petition': permiso, 'new_status': new_status})
 
 
 def create_petition(request):
     if request.method == 'POST':
-        form = PetitionForm(request.POST, request.FILES)  # Include request.FILES for file uploads
+        form = RegistroPermisosForm(request.POST, request.FILES)  # Include request.FILES for file uploads
         if form.is_valid():
             form.save()
             return redirect('create_petition')
     else:
-        form = PetitionForm()
+        form = RegistroPermisosForm()
     return render(request, 'petitions/create_petition.html', {'form': form})
 
 

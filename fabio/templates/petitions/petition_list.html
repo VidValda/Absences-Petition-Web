@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pending Petitions</title>
+    <title>Peticiones Pendientes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
                 <img src="https://i.imgur.com/z4gMSNl.png" alt="Logo" style="height: 150px;">
             </div>
             <div>
-                <h1>Petition Management System</h1>
+                <h1>Sistema de manejo de peticiones</h1>
                 <p>Welcome to the Pending Absences Petitions Dashboard</p>
             </div>
         </div>
@@ -22,66 +22,71 @@
             <thead>
                 <tr>
                     <th>N°</th>
-                    <th>TimeStamp</th>
+                    <th>Fecha</th>
                     <th>CI</th>
                     <th>Email</th>
-                    <th>Student Name</th>
-                    <th>Subjects</th>
-                    <th>Hours</th>
-                    <th>Date</th>
-                    <th>Petition Text</th>
-                    <th>Status</th>
-                    <th>PDF</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Materias</th>
+                    <th>horaInicio</th>
+                    <th>horaFin</th>
+                    <th>Fecha Solicitud</th>
+                    <th>Estado</th>
+                    <th>Justificación</th>
+                    <th>Descripción</th>
                     <th>Actions</th>
                     <th>Observations</th>
                 </tr>
             </thead>
             <tbody>
-                {% for petition in petitions %}
+                {% for permiso, estudiante in permisos %}
                 <tr>
 
-                    <td>{{ petition.id }}</td>
-                    <td>{{ petition.timestamp }}</td>
-                    <td>{{ petition.ci }}</td>
-                    <td>{{ petition.email }}</td>
-                    <td>{{ petition.student_name }}</td>
+                    <td>{{ permiso.id }}</td>
+                    <td>{{ permiso.fecha }}</td>
+                    <td>{{ estudiante.ci }}</td>
+                    <td>{{ estudiante.email }}</td>
+                    <td>{{ estudiante.name }}</td>
+                    <td>{{ estudiante.apellido }}</td>
                     <td>
-                        <button class="btn btn-outline-primary subject-toggle" data-toggle="collapse" data-target="#subject{{ petition.id }}" aria-expanded="false">
-                            <span>Show Subjects</span>
+                        <button class="btn btn-outline-primary subject-toggle" data-toggle="collapse" data-target="#materia{{ permiso.id }}" aria-expanded="false">
+                            <span>Mostrar Materias</span>
                         </button>
-                        <div id="subject{{ petition.id }}" class="collapse">
-                            {{ petition.subjects }}
+                        <div id="materia{{ permiso.id }}" class="collapse">
+                            {{ permiso.materia }}
                         </div>
                     </td>
-                    <td>{{ petition.hours }}</td>
-                    <td>{{ petition.date }}</td>
-                    <td>{{ petition.petition_text }}</td>
-                    <td>{{ petition.status }}</td>
-                    
+                    <td>{{ permiso.horaInicio }}</td>
+                    <td>{{ permiso.horaFin }}</td>
+                    <td>{{ permiso.fechaSolicitud }}</td>
+                    <td>{{ permiso.estado }}</td>
                     <td>
-                        {% if petition.pdf_file %}
-                            <a href="{{ MEDIA_URL }}{{ petition.pdf_file.url }}" target="_blank">View PDF</a>
+                        {% if permiso.justificacion %}
+                            <a href="{{ MEDIA_URL }}{{ permiso.pdf_file.url }}" target="_blank">View PDF</a>
                         {% else %}
                             No PDF
                         {% endif %}
                     </td>
+                    <td>{{ permiso.descripcion }}</td>
+
                     <td>
                         <div class="d-flex align-items-center">
-                            <form method="post" action="{% url 'update_petition' petition.id 'accepted' %}">
+                            <form method="post" action="{% url 'update_petition' permiso.id 'aceptado' %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                                <button type="submit" class="btn btn-success btn-sm">Aceptar</button>
                             </form>
-                            <form method="post" action="{% url 'update_petition' petition.id 'declined' %}">
+                            <form method="post" action="{% url 'update_petition' permiso.id 'rechazado' %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger btn-sm ml-2">Decline</button>
+                                <button type="submit" class="btn btn-danger btn-sm ml-2">Rechazar</button>
                             </form>
                         </div>
                     </td>
+                    
                     <td>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="observation{{ petition.id }}" value="{{ petition.observation }}">
+                            <input type="text" class="form-control" id="observacion{{ permiso.id }}" value="{{ permiso.observacion }}">
                             <div class="input-group-append">
-                                <button class="btn btn-primary update-observation" data-petition-id="{{ petition.id }}">Update</button>
+                                <button class="btn btn-primary update-observation" data-petition-id="{{ permiso.id }}">Update</button>
                             </div>
                         </div>
                     </td>
@@ -112,9 +117,9 @@
                             // Get the petition ID from the data-petition-id attribute
                             var petitionId = $(this).data("petition-id");
                             // Get the observation value from the corresponding input field
-                            var observationValue = $("#observation" + petitionId).val();
+                            var observationValue = $("#observacion" + petitionId).val();
                             // Show a confirmation message
-                            var confirmationMessage = "Observation for Petition #" + petitionId + " updated.";
+                            var confirmationMessage = "Observación para petición #" + petitionId + " actualizada.";
                             alert(confirmationMessage);
                             // Send an AJAX request to update the observation in the model
                             $.ajax({
