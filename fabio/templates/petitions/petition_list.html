@@ -57,11 +57,11 @@
                     <td>{{ permiso.descripcion }}</td>
                     <td>
                         <div class="d-flex flex-column align-items-center">
-                            <form method="post" action="{% url 'update_petition' permiso.id 'aceptado' %}">
+                            <form method="post" action="{% url 'update_petition' permiso.id_solicitud 'aceptado' %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-success btn-sm">Aceptar</button>
                             </form>
-                            <form method="post" action="{% url 'update_petition' permiso.id 'rechazado' %}">
+                            <form method="post" action="{% url 'update_petition' permiso.id_solicitud 'rechazado' %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger btn-sm mt-2">Rechazar</button>
                             </form>

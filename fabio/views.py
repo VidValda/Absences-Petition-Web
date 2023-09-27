@@ -20,7 +20,7 @@ class AdminOnlyView(LoginRequiredMixin, View):
             ids = []
             for permiso in permisos:
                 ids.append(permiso.id_solicitud)
-            print(ids)
+            
 
             result_list = []
             index_list = []
@@ -40,9 +40,7 @@ class AdminOnlyView(LoginRequiredMixin, View):
                     if len(indices) > 1:
                         index_list.append(tuple(indices))
 
-            print(result_list)
-
-            print(index_list)
+            
 
             combined_list = []
             for i, permiso in enumerate(permisos):
@@ -59,12 +57,13 @@ class AdminOnlyView(LoginRequiredMixin, View):
                     
 
                 combined_list.append((permiso, permiso.project, materias))
-            print((len(combined_list),len(permisos)))
-            index_list.sort(reverse=True)
-
-            for i in index_list:
-                del combined_list[i[1]]
-            print((len(combined_list),len(permisos)))
+            
+            
+            sorted_data = sorted(index_list, key=lambda x: x[1],reverse=True)
+            
+            if len(sorted_data)!=0:
+                for i in sorted_data:
+                    del combined_list[i[1]]
 
 
             
@@ -82,7 +81,7 @@ def petition_list(request):
     ids = []
     for permiso in permisos:
         ids.append(permiso.id_solicitud)
-    print(ids)
+    
 
     result_list = []
     index_list = []
@@ -102,9 +101,7 @@ def petition_list(request):
             if len(indices) > 1:
                 index_list.append(tuple(indices))
 
-    print(result_list)
-
-    print(index_list)
+    
 
     combined_list = []
     for i, permiso in enumerate(permisos):
@@ -121,12 +118,12 @@ def petition_list(request):
             
 
         combined_list.append((permiso, permiso.project, materias))
-    print((len(combined_list),len(permisos)))
-    index_list.sort(reverse=True)
-
-    for i in index_list:
-        del combined_list[i[1]]
-    print((len(combined_list),len(permisos)))
+    
+    sorted_data = sorted(index_list, key=lambda x: x[1],reverse=True)
+            
+    if len(sorted_data)!=0:
+        for i in sorted_data:
+            del combined_list[i[1]]
 
 
     
@@ -135,21 +132,25 @@ def petition_list(request):
 
 
 def update_petition_status(request, permiso_id, new_status):
-    permiso = RegistroPermisos.objects.get(pk=permiso_id)
-
+    permisos = RegistroPermisos.objects.filter(id_solicitud = permiso_id)
+    print(permisos)
     if request.method == 'POST':
         
         if new_status == 'aceptado' or new_status == 'rechazado':
-            form = RegistroPermisosForm(request.POST, instance=permiso)
+            for i in permisos:
+                form = RegistroPermisosForm(request.POST, instance=i)
             print(new_status)
-            permiso.estado = new_status
-            permiso.save()
+            for i in permisos:
+                i.estado = new_status
+                i.save()
+
+
             return redirect('petition_list')
         
         else:
             return redirect('petition_list')
     else:
-        form = RegistroPermisosForm(instance=permiso)
+        form = RegistroPermisosForm(instance=permisos)
 
     return render(request, 'petitions/update_petition.html', {'form': form, 'petition': permiso, 'new_status': new_status})
 
