@@ -3,11 +3,6 @@
 <head>
     <title>Peticiones Pendientes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            padding: 0;
-        }
-    </style>
 </head>
 <body>
     <header class="bg-dark text-white py-3">
@@ -32,10 +27,6 @@
                     <th>Email</th>
                     <th>Nombre</th>
                     <th>Apellido</th>
-                    <th>Materias</th>
-                    <th>horaInicio</th>
-                    <th>horaFin</th>
-                    <th>Fecha Solicitud</th>
                     <th>Estado</th>
                     <th>Justificación</th>
                     <th>Descripción</th>
@@ -52,17 +43,7 @@
                     <td>{{ estudiante.email }}</td>
                     <td>{{ estudiante.name }}</td>
                     <td>{{ estudiante.apellido }}</td>
-                    <td>
-                        <button class="btn btn-outline-primary subject-toggle" data-toggle="collapse" data-target="#materia{{ permiso.id }}" aria-expanded="false">
-                            <span>Mostrar Materias</span>
-                        </button>
-                        <div id="materia{{ permiso.id }}" class="collapse">
-                            {{ permiso.materia }}
-                        </div>
-                    </td>
-                    <td>{{ permiso.horaInicio }}</td>
-                    <td>{{ permiso.horaFin }}</td>
-                    <td>{{ permiso.fechaSolicitud }}</td>
+                    
                     <td>{{ permiso.estado }}</td>
                     <td>
                         {% if permiso.justificacion %}
@@ -73,20 +54,22 @@
                     </td>
                     <td>{{ permiso.descripcion }}</td>
                     <td>
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex flex-column align-items-center">
                             <form method="post" action="{% url 'update_petition' permiso.id 'aceptado' %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-success btn-sm">Aceptar</button>
                             </form>
                             <form method="post" action="{% url 'update_petition' permiso.id 'rechazado' %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger btn-sm ml-2">Rechazar</button>
+                                <button type="submit" class="btn btn-danger btn-sm mt-2">Rechazar</button>
                             </form>
                         </div>
                     </td>
+                    
                     <td>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="observacion{{ permiso.id }}" value="{{ permiso.observacion }}">
+                            <input type="text" class="form-control" id="observacion{{ permiso.id }}" value="{{ permiso.observacion }}" style="width: 300px;margin-bottom: 10px;"> <!-- Adjust the width as needed -->
+                            
                             <div class="input-group-append">
                                 <button class="btn btn-primary update-observation" data-petition-id="{{ permiso.id }}">Update</button>
                             </div>
@@ -118,6 +101,9 @@
                             </tbody>
                         </table>
                     </td>
+                </tr>
+                <tr>
+                    <td colspan="15"><hr style="border-top: 5px solid #000;"></td>
                 </tr>
                 {% endfor %}
             </tbody>
