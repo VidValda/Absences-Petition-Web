@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from .models import RegistroPermisos,RegistroEstudiantes
 from .forms import RegistroPermisosForm, RegistroEstudiantesForm
 from django.contrib.auth.decorators import user_passes_test
@@ -166,12 +166,20 @@ def create_petition(request):
 
 
 def update_observation(request):
+    print(request)
     if request.method == 'POST':
         petition_id = request.POST.get('petition_id')
         observation = request.POST.get('observation')
+        print(observation)
 
-        # Perform the update operation on your model based on the petition_id and observation
-        # Example: You can use the petition_id to retrieve the corresponding model instance and update the observation field.
+        # Retrieve the object to update using the petition_id
+        obj_to_update = get_object_or_404(RegistroPermisos, id=petition_id)
+
+        # Update the observation field
+        obj_to_update.observacion = observation
+
+        # Save the changes to the object
+        obj_to_update.save()
 
         # Return a JSON response to indicate success
         return JsonResponse({'message': 'Observation updated successfully'})
