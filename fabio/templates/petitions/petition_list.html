@@ -3,6 +3,11 @@
 <head>
     <title>Peticiones Pendientes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 0;
+        }
+    </style>
 </head>
 <body>
     <header class="bg-dark text-white py-3">
@@ -12,12 +17,12 @@
             </div>
             <div>
                 <h1>Sistema de manejo de peticiones</h1>
-                <p>Welcome to the Pending Absences Petitions Dashboard</p>
+                <p>Bienvenido a la pantalla de manejo de peticiones</p>
             </div>
         </div>
     </header>
     <div class="container mt-5">
-        <h1 class="mb-4">Pending Absences Petitions</h1>
+        <h1 class="mb-4">Peticiones Pendientes</h1>
         <table class="table">
             <thead>
                 <tr>
@@ -39,9 +44,8 @@
                 </tr>
             </thead>
             <tbody>
-                {% for permiso, estudiante in permisos %}
+                {% for permiso, estudiante, materias in permisos %}
                 <tr>
-
                     <td>{{ permiso.id }}</td>
                     <td>{{ permiso.fecha }}</td>
                     <td>{{ estudiante.ci }}</td>
@@ -68,7 +72,6 @@
                         {% endif %}
                     </td>
                     <td>{{ permiso.descripcion }}</td>
-
                     <td>
                         <div class="d-flex align-items-center">
                             <form method="post" action="{% url 'update_petition' permiso.id 'aceptado' %}">
@@ -81,7 +84,6 @@
                             </form>
                         </div>
                     </td>
-                    
                     <td>
                         <div class="input-group">
                             <input type="text" class="form-control" id="observacion{{ permiso.id }}" value="{{ permiso.observacion }}">
@@ -91,61 +93,86 @@
                         </div>
                     </td>
                 </tr>
+                <!-- Add a new row to display subjects and hours -->
+                <tr>
+                    <td colspan="15"> <!-- colspan="15" to span across all columns -->
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Materias</th>
+                                    <th>hora Inicio</th>
+                                    <th>hora Fin</th>
+                                    <th>Fecha permiso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Loop through subjects within the 'permiso' object -->
+                                {% for materia,hI,hF,fecha in materias %}
+                                <tr>
+                                    <td>{{ materia }}</td>
+                                    <td>{{ hI }}</td>
+                                    <td>{{ hF }}</td>
+                                    <td>{{ fecha }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
                 {% endfor %}
-                <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-                <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-                <script>
-                    $(document).ready(function() {
-                        // Add click event listener to the subject-toggle buttons
-                        $(".subject-toggle").click(function() {
-                            // Find the corresponding subject div using data-target attribute
-                            var targetId = $(this).data("target");
-                            // Toggle the visibility of the subject div with a smooth transition
-                            $(targetId).collapse("toggle");
-                            // Toggle the button text between "Show Subjects" and "Hide Subjects"
-                            $(this).find('span').text(function(_, text) {
-                                return text === "Show Subjects" ? "Hide Subjects" : "Show Subjects";
-                            });
-                        });
-                    });
-                </script>
-                <script>
-                    $(document).ready(function() {
-                        // Add click event listener to the update-observation buttons
-                        $(".update-observation").click(function() {
-                            // Get the petition ID from the data-petition-id attribute
-                            var petitionId = $(this).data("petition-id");
-                            // Get the observation value from the corresponding input field
-                            var observationValue = $("#observacion" + petitionId).val();
-                            // Show a confirmation message
-                            var confirmationMessage = "Observación para petición #" + petitionId + " actualizada.";
-                            alert(confirmationMessage);
-                            // Send an AJAX request to update the observation in the model
-                            $.ajax({
-                                type: "POST",
-                                url: "{% url 'update_observation' %}",
-                                data: {
-                                    petition_id: petitionId,
-                                    observation: observationValue,
-                                    csrfmiddlewaretoken: "{{ csrf_token }}",
-                                },
-                                success: function(response) {
-                                    // Optionally, you can handle the success response here
-                                    // For example, display a success message
-                                    console.log("Observation updated successfully.");
-                                },
-                                error: function(xhr, status, error) {
-                                    // Handle errors here if needed
-                                    console.error("Error updating observation:", error);
-                                },
-                            });
-                        });
-                    });
-                </script>
             </tbody>
         </table>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                // Add click event listener to the subject-toggle buttons
+                $(".subject-toggle").click(function() {
+                    // Find the corresponding subject div using data-target attribute
+                    var targetId = $(this).data("target");
+                    // Toggle the visibility of the subject div with a smooth transition
+                    $(targetId).collapse("toggle");
+                    // Toggle the button text between "Show Subjects" and "Hide Subjects"
+                    $(this).find('span').text(function(_, text) {
+                        return text === "Show Subjects" ? "Hide Subjects" : "Show Subjects";
+                    });
+                });
+            });
+        </script>
+        <script>
+            $(document).ready(function() {
+                // Add click event listener to the update-observation buttons
+                $(".update-observation").click(function() {
+                    // Get the petition ID from the data-petition-id attribute
+                    var petitionId = $(this).data("petition-id");
+                    // Get the observation value from the corresponding input field
+                    var observationValue = $("#observacion" + petitionId).val();
+                    // Show a confirmation message
+                    var confirmationMessage = "Observación para petición #" + petitionId + " actualizada.";
+                    alert(confirmationMessage);
+                    // Send an AJAX request to update the observation in the model
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'update_observation' %}",
+                        data: {
+                            petition_id: petitionId,
+                            observation: observationValue,
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                        },
+                        success: function(response) {
+                            // Optionally, you can handle the success response here
+                            // For example, display a success message
+                            console.log("Observation updated successfully.");
+                        },
+                        error: function(xhr, status, error) {
+                            // Handle errors here if needed
+                            console.error("Error updating observation:", error);
+                        },
+                    });
+                });
+            });
+        </script>
     </div>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

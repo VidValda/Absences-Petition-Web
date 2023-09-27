@@ -9,8 +9,8 @@ class TodoItem(models.Model):
 class RegistroEstudiantes(models.Model):
     name = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
-    email = models.EmailField()
-    ci = models.IntegerField()
+    email = models.EmailField(blank=True, null=True)
+    ci = models.IntegerField(blank=True, null=True)
 
 class RegistroPermisos(models.Model):
     STATUS_CHOICES = (
@@ -19,16 +19,16 @@ class RegistroPermisos(models.Model):
         ('rechazado', 'Rechazado'),
     )
 
-    materia = models.TextField()
-    fecha = models.DateField()
+    materia = models.TextField(blank=True, null=True)
+    fecha = models.DateField(blank=True, null=True)
     justificacion = models.FileField(upload_to='pdfs/', blank=True, null=True)
-    project = models.ForeignKey(RegistroEstudiantes, on_delete=models.CASCADE)
-
-    horaFin = models.TimeField()
-    horaInicio = models.TimeField()
-    fechaSolicitud = models.DateField()
+    project = models.ForeignKey(RegistroEstudiantes, on_delete=models.CASCADE,blank=True, null=True)
+    id_solicitud = models.IntegerField(blank=True, null=True)
+    horaFin = models.TimeField(blank=True, null=True)
+    horaInicio = models.TimeField(blank=True, null=True)
+    fechaSolicitud = models.DateField(blank=True, null=True)
     estado = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    descripcion = models.TextField()
+    descripcion = models.TextField(blank=True, null=True)
     observacion = models.TextField(blank=True, null=True)
 
     

@@ -17,8 +17,58 @@ class AdminOnlyView(LoginRequiredMixin, View):
     def get(self, request):
         if request.user.is_staff:  # Additional check for admin users
             permisos = RegistroPermisos.objects.filter(estado='pendiente')
-     
-            combined_list = [(permiso, permiso.project) for permiso in permisos]
+            ids = []
+            for permiso in permisos:
+                ids.append(permiso.id_solicitud)
+            print(ids)
+
+            result_list = []
+            index_list = []
+
+            count_dict = {}
+
+            for index, item in enumerate(ids):
+                if item in count_dict:
+                    count_dict[item][0] += 1
+                    count_dict[item][1].append(index)
+                else:
+                    count_dict[item] = [1,[index]]
+
+            for item, (count,indices) in count_dict.items():
+                if count > 1:
+                    result_list.extend([(item,) * count])
+                    if len(indices) > 1:
+                        index_list.append(tuple(indices))
+
+            print(result_list)
+
+            print(index_list)
+
+            combined_list = []
+            for i, permiso in enumerate(permisos):
+                materias = []
+                materias = [(permiso.materia,permiso.horaInicio,permiso.horaFin,permiso.fecha)]
+                for ind,j in enumerate(index_list):
+                    if i == j[0]:
+                        auxPermisos = RegistroPermisos.objects.filter(id_solicitud = result_list[ind][0],estado='pendiente')
+                        
+                        materias = []
+                        for auxPermiso in auxPermisos:
+                            materias.append((auxPermiso.materia,auxPermiso.horaInicio,auxPermiso.horaFin,auxPermiso.fecha))
+                        
+                    
+
+                combined_list.append((permiso, permiso.project, materias))
+            print((len(combined_list),len(permisos)))
+            index_list.sort(reverse=True)
+
+            for i in index_list:
+                del combined_list[i[1]]
+            print((len(combined_list),len(permisos)))
+
+
+            
+
             return render(request, 'petitions/petition_list.html', {'permisos': combined_list})
         else:
             return render(request, 'petitions/not_authorized.html')
@@ -29,7 +79,57 @@ class AdminOnlyView(LoginRequiredMixin, View):
 @user_passes_test(admin_user_check, login_url='/login/')
 def petition_list(request):
     permisos = RegistroPermisos.objects.filter(estado='pendiente')
-    combined_list = [(permiso, permiso.project) for permiso in permisos]
+    ids = []
+    for permiso in permisos:
+        ids.append(permiso.id_solicitud)
+    print(ids)
+
+    result_list = []
+    index_list = []
+
+    count_dict = {}
+
+    for index, item in enumerate(ids):
+        if item in count_dict:
+            count_dict[item][0] += 1
+            count_dict[item][1].append(index)
+        else:
+            count_dict[item] = [1,[index]]
+
+    for item, (count,indices) in count_dict.items():
+        if count > 1:
+            result_list.extend([(item,) * count])
+            if len(indices) > 1:
+                index_list.append(tuple(indices))
+
+    print(result_list)
+
+    print(index_list)
+
+    combined_list = []
+    for i, permiso in enumerate(permisos):
+        materias = []
+        materias = [(permiso.materia,permiso.horaInicio,permiso.horaFin,permiso.fecha)]
+        for ind,j in enumerate(index_list):
+            if i == j[0]:
+                auxPermisos = RegistroPermisos.objects.filter(id_solicitud = result_list[ind][0],estado='pendiente')
+                
+                materias = []
+                for auxPermiso in auxPermisos:
+                    materias.append((auxPermiso.materia,auxPermiso.horaInicio,auxPermiso.horaFin,auxPermiso.fecha))
+                
+            
+
+        combined_list.append((permiso, permiso.project, materias))
+    print((len(combined_list),len(permisos)))
+    index_list.sort(reverse=True)
+
+    for i in index_list:
+        del combined_list[i[1]]
+    print((len(combined_list),len(permisos)))
+
+
+    
 
     return render(request, 'petitions/petition_list.html', {'permisos': combined_list})
 
